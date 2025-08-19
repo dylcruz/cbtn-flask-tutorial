@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title> My Todos</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    
+        <script>
+            let current_todos = [];
+            
+            function setTodos(todos) {
+                let todoList = document.getElementById('todo-list');
+                while (todoList.firstChild) {
+                    todoList.removeChild(todoList.firstChild);
+                }
+                for (let todo of todos) {
+                    let container = document.createElement('div');
+
+                    let text = document.createElement('h3');
+                    if (todo.is_complete) {
+                        text.innerText = '• ' + todo.text + ' - Complete!';
+                        text.className = 'text-success'
+                    } else {
+                        text.innerText = '• ' + todo.text;
+                    }
+
+                    let completeButton = document.createElement('button');
+                    completeButton.innerText = 'Mark as complete';
+                    completeButton.className = 'btn btn-success';
+                    completeButton.onclick = function() { markTodoAsCompleted(todo.text) };
+
+                    let deleteButton = document.createElement('button');
+                    deleteButton.innerText = 'Delete';
+                    deleteButton.className = 'btn btn-danger';
+                    deleteButton.onclick = function() { deleteTodo(todo.text) };
+
+                    todoList.appendChild(container);
+
+                    container.appendChild(text);
+                    container.appendChild(completeButton);
+                    container.appendChild(deleteButton);
+                }
+            }
+
+            function createTodo() {
+                let newTodoInput = document.getElementById('new-todo-input');
+                let newTodoText = newTodoInput.value;
+                let newTodo = { text: newTodoText };
+                
+                fetch('/api/todos', {
+                    method: 'POST',
+                    body: JSON.stringify(newTodo),
+                    headers: { 'Content-Type': 'application/json '}
+                })
+                .then(() => {
+                    current_todos.push(newTodo);
+                    setTodos(current_todos);
+                    newTodoInput.value = '';
+                })
+            }
+        
+            function markTodoAsCompleted(text) {
+                fetch('/api/todos/' + text, {
+                    method: 'PUT',
+                })
+                .then(response => {
+                    return response.json();
+                })
+                .then(updatedTodos => {
+                    current_todos = updatedTodos;
+                    setTodos(current_todos);
+                })
+            }
+
+            function deleteTodo(text) {
+                fetch('/api/todos/' + text, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    return response.json();
+                })
+                .then(updatedTodos => {
+                    current_todos = updatedTodos;
+                    setTodos(current_todos);
+                })
+            }
+        </script>
+    </head>
+    <body>
+        <h1>My ToDos</h1>
+        <div id="todo-list">
+        </div>
+        
+        <input id="new-todo-input" placeholder="Enter new todo text here..."/>
+        <button type="button" class="btn btn-primary" onclick="createTodo()">Create ToDo</button>
+
+        <script>
+            fetch('/api/todos')
+                .then(response => {
+                    return response.json();
+                })
+                .then(todos => {
+                    setTodos(todos);
+                    current_todos = todos;
+                })
+
+        </script>
+        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+    </body>
+</html>
