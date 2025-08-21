@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Site</title>
+    </head>
+
+    <body>
+        <h1>Running JS in the browser</h1>
+        {% for article in articles %}
+            <h3>{{ article.get('title') }} <a href="/back-end?remove={{ article.get('title') }}"><button>Remove</button></a></h3>
+        {% endfor %}
+    </body>
+</html>

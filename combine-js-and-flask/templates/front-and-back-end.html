@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Site</title>
+    </head>
+
+    <body>
+        <h1>Running JS in the browser</h1>
+
+        <script>
+            fetch('/articles').then(response => {
+                return response.json();
+            }).then(data => { 
+                for (let article of data) {
+                    let newTag = document.createElement('h3');
+                    newTag.innerText = article.title;
+
+                    let newButton = document.createElement('button');
+                    newButton.innerText = 'Remove';
+                    newButton.onclick = () => {
+                        newTag.remove();
+                    };
+                    newTag.appendChild(newButton);
+                    document.body.appendChild(newTag);
+                }
+            });
+        </script>
+    </body>
+</html>
