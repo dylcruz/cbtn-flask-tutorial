@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Products</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+        <script>
+            function addToCart(productId){
+                fetch('api/cart', {
+                    method: 'put',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: productId })
+                })
+                .then(response => response.json())
+                .then(data => { 
+                    alert(data.message);
+                    location.reload();
+                })
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Products</h1>
+        {% for product in products %}
+            <div>
+                <h3>{{ product.get('name') }}</h3>
+                <p>{{ product.get('price') }}</p>
+                {% if product.get('isInCart') %}
+                    <p>Item is already in your cart!</p>
+                {% else  %}
+                <button onclick="addToCart('{{ product.get('id')}}')" type="button" class="btn btn-primary">Add to cart</button>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </body>
+</html>
