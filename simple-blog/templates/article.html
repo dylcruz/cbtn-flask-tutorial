@@ -1,5 +1,51 @@
 {% extends 'base.html' %}
 {% block content %}
+
+<script>
+    function upvoteArticle(articleSlug) {
+       fetch(`/api/articles/${articleSlug}/upvotes`, {
+            method: 'post'
+       })
+       .then(response => response.json())
+       .then(updatedArticle => {
+            const upvotesSpan = document.getElementById('number-of-upvotes');
+            upvotesSpan.innerText = updatedArticle.upvotes;
+       });
+    }
+
+    function addCommentToArticle(articleSlug) {
+        const author = document.getElementById('author-input').value;
+        const text = document.getElementById('text-input').value;
+        fetch(`/api/articles/${articleSlug}/comments`, {
+            method: "post",
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({ author, text })
+        })
+        .then(() => {
+            alert('Successfully added comment!');
+            location.reload();
+        });
+    }
+</script>
+
 <h1>{{ title }}</h1>
+<div>
+    <button onclick="upvoteArticle('{{ slug }}')">Upvote</button>
+    <p>This article has <span id="number-of-upvotes">{{ upvotes }}</span> upvote(s)</p>
+</div>
 <p>{{ content }}</p>
+
+<div>
+    <input id="author-input" placeholder="Enter your name..." />
+    <textarea id="text-input" placeholder="Enter your comment..."></textarea>
+    <button onclick="addCommentToArticle('{{ slug }}')">Submit</button>
+</div>
+
+{% for comment in comments %}
+<div>
+    <h3>{{ comment.get('author') }}</h3>
+    <p>{{ comment.get('text') }}</p>
+</div>
+{% endfor %}
+
 {% endblock %}
