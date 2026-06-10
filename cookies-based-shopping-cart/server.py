@@ -13,28 +13,28 @@ products = [
 
 @app.before_request
 def parse_cart():
-    cart_cookie_value = request.cookies.get("cart") or '[]'
+    cart_cookie_value = request.cookies.get("cart") or "[]"
     cart_ids = json.loads(cart_cookie_value)
     g.cart_ids = cart_ids
 
 
-@app.get('/products')
+@app.get("/products")
 def products_page():
-    products_with_added_data = [{**product, 'isInCart': product.get('id') in g.cart_ids}  for product in products]
-    return render_template('products.html', products=products_with_added_data)
+    products_with_added_data = [
+        {**product, "isInCart": product.get("id") in g.cart_ids} for product in products
+    ]
+    return render_template("products.html", products=products_with_added_data)
 
 
-@app.get('/cart')
+@app.get("/cart")
 def cart_page():
     cart_items = [
         next(product for product in products if product["id"] == id)
         for id in g.cart_ids
     ]
     return render_template(
-        'shopping-cart.html', 
-        products=cart_items, 
-        cartIsEmpty=len(cart_items) == 0
-        )
+        "shopping-cart.html", products=cart_items, cartIsEmpty=len(cart_items) == 0
+    )
 
 
 @app.get("/api/cart")
@@ -50,7 +50,7 @@ def load_user_cart():
 def add_to_cart():
     item_id_to_add = request.json["id"]
     g.cart_ids.append(item_id_to_add)
-    return {"message": "Successfully added item to cart!" }
+    return {"message": "Successfully added item to cart!"}
 
 
 @app.delete("/api/cart/<string:item_id>")
